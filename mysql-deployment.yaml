@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: mysql-deployment
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-db
+
+  template:
+    metadata:
+      labels:
+        app: mysql-db
+    spec:
+      containers:
+        - name: mysql-container
+          image: mysql
+          ports:
+            - containerPort: 3306
+          env: # 참고) mysql 이미지는 환경변수를 적어주어야만 정상적으로 동작한다
+            - name: MYSQL_ROOT_PASSWORD # 비밀번호 정의
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: mysql-root-password
+            - name: MYSQL_DATABASE # 초기 데이터베이스 정의
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-config
+                  key: mysql-database
